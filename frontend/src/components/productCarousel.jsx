@@ -47,17 +47,26 @@ const ProductCarousel = ({ products }) => {
     }, 300);
   };
 
-  // Determine animation classes based on direction and transition state
+  // Function to scroll to products section
+  const scrollToProducts = () => {
+    // You can use an id to target the products section
+    const productsSection = document.getElementById('best-sellers-section');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Enhanced animation classes for more dramatic effect
   const getAnimationClasses = () => {
-    if (!isLoaded) return "opacity-0 translate-y-4";
+    if (!isLoaded) return "opacity-0 translate-y-16 scale-95";
     
     if (isTransitioning) {
       return direction === 'next' 
-        ? "opacity-0 -translate-x-8" 
-        : "opacity-0 translate-x-8";
+        ? "opacity-0 -translate-x-24 scale-90 rotate-2" 
+        : "opacity-0 translate-x-24 scale-90 -rotate-2";
     }
     
-    return "opacity-100 translate-x-0";
+    return "opacity-100 translate-x-0 scale-100 rotate-0";
   };
 
   const currentProduct = products[currentIndex];
@@ -66,8 +75,8 @@ const ProductCarousel = ({ products }) => {
     <div className="flex-grow mt-15 relative overflow-hidden">
       {products.length > 0 && currentProduct?.pictures?.length > 0 ? (
         <>
-          <div className={`w-full h-[calc(100vh-64px)] transition-all duration-500 ease-in-out ${
-            isTransitioning ? (direction === 'next' ? 'scale-105 opacity-90' : 'scale-95 opacity-90') : 'scale-100 opacity-100'
+          <div className={`w-full h-[calc(100vh-64px)] transition-all duration-700 ease-out ${
+            isTransitioning ? (direction === 'next' ? 'scale-110 opacity-90 blur-sm' : 'scale-90 opacity-90 blur-sm') : 'scale-100 opacity-100 blur-0'
           }`}>
             <img
               src={currentProduct.pictures[0]}
@@ -77,23 +86,23 @@ const ProductCarousel = ({ products }) => {
           </div>
           
           <div 
-            className={`absolute left-50 top-1/3 max-w-md transition-all duration-500 ease-in-out transform ${getAnimationClasses()}`}
+            className={`absolute left-50 top-1/3 max-w-md transition-all duration-700 ease-out transform ${getAnimationClasses()}`}
           >
-            <h1 className="text-4xl font-bold text-black  px-4 py-2 rounded backdrop-blur-sm">
+            <h1 className="text-5xl font-bold  px-6 py-3 rounded text-shadow-lg mb-8">
               {currentProduct.name}
             </h1>
             <button 
-    
-    className="mt-10 ml-5 bg-black text-white px-6 py-2 rounded-lg text-lg font-large hover:bg-[rgb(113,127,223)] transition-all"
-  >
-    Shop Now
-  </button>
+              onClick={scrollToProducts}
+              className="ml-5 bg-black text-white px-8 py-3 rounded-lg text-xl font-bold hover:bg-[rgb(113,127,223)] hover:scale-110 hover:shadow-xl active:scale-95 transition-all duration-300"
+            >
+              Shop Now
+            </button>
           </div>
           
           {/* Left Arrow */}
           <button 
             onClick={handlePrevious}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-3 shadow-lg transition-all disabled:opacity-50"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-3 shadow-lg transition-all disabled:opacity-50 hover:scale-110"
             aria-label="Previous product"
             disabled={isTransitioning}
           >
@@ -105,7 +114,7 @@ const ProductCarousel = ({ products }) => {
           {/* Right Arrow */}
           <button 
             onClick={handleNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-3 shadow-lg transition-all disabled:opacity-50"
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-3 shadow-lg transition-all disabled:opacity-50 hover:scale-110"
             aria-label="Next product"
             disabled={isTransitioning}
           >
@@ -119,8 +128,8 @@ const ProductCarousel = ({ products }) => {
             {products.map((_, idx) => (
               <span 
                 key={idx} 
-                className={`h-2 w-2 rounded-full transition-all duration-300 ${
-                  idx === currentIndex ? 'bg-white w-4' : 'bg-white/50'
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  idx === currentIndex ? 'bg-white w-8' : 'bg-white/50 w-2'
                 }`}
               />
             ))}

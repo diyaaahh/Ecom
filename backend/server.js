@@ -8,10 +8,10 @@ const session = require('express-session')
 
 const app = express();
 const PORT = 3000;
-app.use(cookieParser());  // Add this
+app.use(cookieParser());  
 
-app.use(express.json()); // ✅ Parses JSON request bodies
-app.use(express.urlencoded({ extended: true })); // ✅ Parses form data
+app.use(express.json()); // Parses JSON request bodies
+app.use(express.urlencoded({ extended: true })); // Parses form data
 
 
 app.use(cors({
@@ -24,7 +24,7 @@ app.use(
     session({
         secret: "dsakdbdbaszj",
         resave: false,
-        saveUninitialized: true, // Add this line to ensure uninitialized sessions are saved
+        saveUninitialized: true, 
         cookie: {
             secure: false, 
             httpOnly: true,
@@ -48,6 +48,12 @@ app.use("/product", productRoutes)
 
 const cartRoutes = require('./Routes/cartRoutes');
 app.use('/cart', cartRoutes);
+
+const reviewRoutes = require('./Routes/reviewRoutes');
+app.use('/review', reviewRoutes)
+
+const paymentRoutes = require('./Routes/stripeRoutes');
+app.use('/payment', paymentRoutes)
 
 
 app.listen(PORT, () => {

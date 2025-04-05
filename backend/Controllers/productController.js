@@ -136,7 +136,67 @@ const getProductsByCategory = async (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     }
   };
-  
-module.exports = { addProduct, getLatestProduct, getRecentProducts, getRecentProductsByCategory , getTopSelling, getProductsByCategory};
+
+  const updateQuantitiesSold = async (req, res) => {
+    try {
+      const { productUpdates } = req.body;
+      
+      if (!productUpdates || !Array.isArray(productUpdates)) {
+        return res.status(400).json({ error: "Invalid product updates format. Expected an array of product updates." });
+      }
+      
+      // Begin a transaction to ensure all updates succeed or fail together
+      const client = await pool.connect();
+      
+      try {
+        await client.query('BEGIN');
+        
+        // Process each product update
+        for (const update of productUpdates) {
+          const { productId, quantitySold } = update;
+          
+          if (!productId || typeof quantitySold !== 'number' || quantitySold <= 0) {
+            throw new Error(`Invalid update data for product ID ${productId}`);
+          }
+          
+          // Update the product's qty_sold value
+          const updateQuery = `
+            UPDATE products 
+            SET qty_sold = COALESCE(qty_sold, 0) + $1 
+            WHERE id = $2
+            RETURNING id, name, qty_sold;
+          `;
+          
+          const result = await client.query(updateQuery, [quantitySold, productId]);
+          
+          if (result.rows.length === 0) {
+            throw new Error(`Product with ID ${productId} not found`);
+          }
+        }
+        
+        // Commit the transaction if all updates were successful
+        await client.query('COMMIT');
+        
+        res.status(200).json({ 
+          message: "Product quantities sold updated successfully",
+          count: productUpdates.length
+        });
+        
+      } catch (error) {
+        // Roll back the transaction if any update failed
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        // Release the client back to the pool
+        client.release();
+      }
+      
+    } catch (error) {
+      console.error("Error updating product quantities sold:", error);
+      res.status(500).json({ error: "Failed to update product quantities", message: error.message });
+    }
+  };
+
+module.exports = { addProduct, getLatestProduct, getRecentProducts, getRecentProductsByCategory , getTopSelling, getProductsByCategory , updateQuantitiesSold};
 
 

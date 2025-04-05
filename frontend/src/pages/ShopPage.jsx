@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import ProductCard from "../components/productCard"; // Assuming ProductCard is in the same directory
+import ProductCard from "../components/productCard";
 
 export default function ShopPage() {
   const { category } = useParams();
@@ -13,7 +13,6 @@ export default function ShopPage() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        // Adjust the URL to match your backend endpoint structure
         const response = await axios.get(`http://localhost:3000/product/category/${category}`, {
           withCredentials: true,
         });

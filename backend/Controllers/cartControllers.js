@@ -4,7 +4,6 @@ const pool = require("../database");
 const addToCart = async (req, res) => {
   try {
     const { userEmail,productId, quantity } = req.body;
-     // Assuming authentication middleware sets req.user with email
      console.log("Request Body:", req.body);
 
     // Check if item already exists in cart
@@ -110,7 +109,7 @@ const removeFromCart = async (req, res) => {
 // Clear cart
 const clearCart = async (req, res) => {
   try {
-    const userEmail = req.user.email;
+    const userEmail = req.query.userEmail;
     
     const query = "DELETE FROM cart_items WHERE user_email = $1";
     await pool.query(query, [userEmail]);

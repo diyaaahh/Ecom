@@ -1,4 +1,3 @@
-// controllers/userController.js
 const pool = require("../database");
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
@@ -61,12 +60,12 @@ const loginUser = async (req, res) => {
         // Set cookie with the token (httpOnly for security)
         res.cookie("authToken", token, {
             httpOnly: true, 
-            secure: process.env.NODE_ENV === "production", // Set to true if using HTTPS
-            sameSite: "Lax", // Adjust for CSRF protection
+            secure: process.env.NODE_ENV === "production", 
+            sameSite: "Lax", 
             maxAge: 3600000, // 1 hour
         });
 
-        console.log("Cookie set successfully:", token); // Debugging log
+        console.log("Cookie set successfully:", token); 
   
         return res.json({
             message: "Login successful",

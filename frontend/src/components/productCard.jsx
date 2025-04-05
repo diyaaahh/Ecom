@@ -1,16 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import StarRating from "./StarRating"; 
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const [userEmail, setUserEmail] = useState("");
   const [selectedImage, setSelectedImage] = useState(product.pictures?.[0]);
   const [quantity, setQuantity] = useState(1);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [userRating, setUserRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -20,14 +26,27 @@ export default function ProductCard({ product }) {
         });
         if (response.data.user) {
           setIsLoggedIn(true);
+          setUserEmail(response.data.user.email);
         }
       } catch (error) {
         setIsLoggedIn(false);
       }
     };
 
+    // Fetch average rating for the product
+    const fetchRating = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/review/average?product_id=${product.id || product._id}`);
+        setAverageRating(response.data.average_rating);
+        setTotalReviews(parseInt(response.data.total_reviews));
+      } catch (error) {
+        console.error("Error fetching product rating:", error);
+      }
+    };
+      
     checkAuth();
-  }, []);
+    fetchRating();
+  }, [product.id, product._id]);
 
   const handleProductClick = () => {
     setIsModalOpen(true);
@@ -71,13 +90,68 @@ export default function ProductCard({ product }) {
       }, {
         withCredentials: true
       });
+
       toast.success(`Added ${quantity} ${product.name} to cart!`);
-      setIsModalOpen(false)
+      setIsModalOpen(false);
     } catch (error) {
-    toast.error("Error adding to cart")
-    setIsModalOpen(false)
-      console.error("Error adding to cart:", error)
+      toast.error("Error adding to cart");
+      setIsModalOpen(false);
+      console.error("Error adding to cart:", error);
     }
+  };
+
+  // Handle submitting a rating
+  const submitRating = async () => {
+    if (!isLoggedIn) {
+      toast.error("Please log in to rate this product");
+      return;
+    }
+
+    if (userRating === 0) {
+      toast.error("Please select a rating");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:3000/review/add", {
+        user_email: userEmail,
+        product_id: product.id || product._id,
+        rating: userRating,
+        review_text: reviewText
+      });
+      setIsModalOpen(false)
+      toast.success("Thank you for your rating!");
+      
+      // Refresh the average rating
+      const response = await axios.get(`http://localhost:3000/review/average?product_id=${product.id || product._id}`);
+      setAverageRating(response.data.average_rating);
+      setTotalReviews(parseInt(response.data.total_reviews));
+      
+      // Reset the form
+      setReviewText("");
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+      toast.error("Failed to submit rating. Please try again.");
+    }
+  };
+
+  // Interactive star rating component
+  const InteractiveStarRating = () => {
+    return (
+      <div className="flex items-center space-x-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            onClick={() => setUserRating(star)}
+            className={`cursor-pointer text-2xl ${
+              star <= userRating ? "text-yellow-500" : "text-gray-300"
+            }`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -87,9 +161,11 @@ export default function ProductCard({ product }) {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={`relative cursor-pointer rounded-lg overflow-hidden shadow-lg transition-transform transform hover:scale-105 ${
-          isModalOpen ? 'filter blur-sm' : ''
+            isModalOpen ? 'filter blur-sm' : ''
         }`}
       >
+        
+
         {/* Product Image */}
         <div className="relative">
           {product.pictures && product.pictures.length > 0 ? (
@@ -127,6 +203,12 @@ export default function ProductCard({ product }) {
         <div className="p-4 bg-white">
           <h3 className="font-semibold text-lg mb-1 truncate">{product.name}</h3>
           <p className="text-gray-700 mb-2 truncate">{product.category}</p>
+          
+          {/* Star Rating Display */}
+          <div className="mb-2">
+            <StarRating rating={averageRating} totalReviews={totalReviews} />
+          </div>
+          
           <div className="flex justify-between items-center">
             <p className="font-bold text-lg">${parseFloat(product.price).toFixed(2)}</p>
             <p className="text-sm text-gray-500">{product.qty_sold} sold</p>
@@ -155,6 +237,15 @@ export default function ProductCard({ product }) {
             {isLoggedIn ? (
               <div className="p-8">
                 <h2 className="text-3xl font-bold mb-4">{product.name}</h2>
+                
+                {/* Display rating in the modal as well */}
+                <div className="mb-4">
+                  <div className="flex items-center space-x-2">
+                    <StarRating rating={averageRating} totalReviews={totalReviews} />
+                    <span className="text-gray-600">({totalReviews} reviews)</span>
+                  </div>
+                </div>
+                
                 <img 
                   src={selectedImage} 
                   alt="Product" 
@@ -218,6 +309,20 @@ export default function ProductCard({ product }) {
                     className="mt-4 w-full bg-black text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-[rgb(113,127,223)] transition-colors"
                   >
                     Add to Cart
+                  </button>
+                </div>
+                {/* Rating section */}
+                <div className="mb-6 mt-10 p-4 bg-gray-50 rounded-lg flex flex-col justify-center items-center">
+                  <h3 className="font-semibold text-lg mb-2">Rate this product</h3>
+                  <div className="mb-3">
+                    <InteractiveStarRating />
+                  </div>
+                  
+                  <button
+                    onClick={submitRating}
+                    className="px-4 py-2 bg-black text-white rounded-md hover:bg-[rgb(113,127,223)] transition-colors"
+                  >
+                    Submit Review
                   </button>
                 </div>
               </div>

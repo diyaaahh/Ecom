@@ -6,9 +6,9 @@ const Footer = () => {
       <div className="w-full">
         <p>&copy; 2025 MyApp. All rights reserved.</p>
         <div className="flex justify-center space-x-6 mt-10">
-          <Link to="/about" className="hover:text-gray-400">About</Link>
-          <Link to="/services" className="hover:text-gray-400">Services</Link>
-          <Link to="/contact" className="hover:text-gray-400">Contact</Link>
+          <Link to="/" className="hover:text-[rgb(113,127,223)]">About</Link>
+          <Link to="/" className="hover:text-[rgb(113,127,223)]">Services</Link>
+          <Link to="/" className="hover:text-[rgb(113,127,223)]">Contact</Link>
         </div>
       </div>
     </div>

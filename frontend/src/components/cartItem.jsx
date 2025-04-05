@@ -21,7 +21,6 @@ const CartItemCard = ({ product, onRemove }) => {
   }, [isModalOpen]);
 
   const handleCheckout = () => {
-    // Implement checkout functionality or navigate to checkout page
     navigate("/checkout");
   };
 

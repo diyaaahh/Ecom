@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import CartItemCard from "../components/CartItem"; // Import the CartItemCard component
+import CartItemCard from "../components/CartItem"; 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const CartPage = () => {
     const [user, setUser] = useState(null);
@@ -36,9 +39,8 @@ const CartPage = () => {
   const fetchCartItems = async () => {
     try {
       setLoading(true);
-      // Make sure user exists before trying to access user.email
+     
       if (!user || !user.email) {
-        // Either wait or handle this case - perhaps by returning early
         setLoading(false);
         return;
       }
@@ -99,9 +101,22 @@ const CartPage = () => {
     }
   };
 
-  const handleCheckout = () => {
-    // Implement checkout functionality or navigate to checkout page
-    navigate("/checkout");
+  const handleCheckout = async () => {
+    try {
+      const stripe = await stripePromise;
+  
+      const response = await axios.post("http://localhost:3000/payment/create-checkout-session", {
+        cartItems,
+        userEmail: user.email,
+      }, {
+        withCredentials: true,
+      });
+  
+      window.location.href = response.data.url;
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error("Something went wrong during checkout");
+    }
   };
 
   if (loading) {

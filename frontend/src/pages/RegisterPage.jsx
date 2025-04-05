@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom"; 
-// Importing react-toastify styles
 import 'react-toastify/dist/ReactToastify.css';
 
 const RegisterPage = () => {
@@ -12,7 +11,7 @@ const RegisterPage = () => {
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
 
-  const navigate = useNavigate(); // For redirecting user to login page on successful registration
+  const navigate = useNavigate(); 
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -45,7 +44,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center shadow-md py-10 mt-10">
+    <div className="flex justify-center items-center shadow-md py-10 mt-10 mx-20">
       <div className="flex flex-col md:flex-row w-full md:w-3/4 shadow-lg rounded-lg overflow-hidden bg-white">
         <div className="w-full md:w-1/2">
           <img

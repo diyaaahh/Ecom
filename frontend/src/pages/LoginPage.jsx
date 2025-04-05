@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate(); // For redirecting after successful login
+  const navigate = useNavigate(); 
 
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:3000/auth/google";
@@ -20,14 +20,12 @@ const LoginPage = () => {
         const response = await axios.post(
             "http://localhost:3000/user/login",
             { email, password },
-            { withCredentials: true } // Add this
+            { withCredentials: true }
           );
           
-
-      // Check if login is successful
       if (response.data.message === "Login successful") {
         toast.success("Login successful!");
-        navigate("/"); // Redirect to a dashboard or home page
+        navigate("/");
       }
     } catch (error) {
       // Handle error (wrong credentials, server error, etc.)
@@ -40,7 +38,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-center items-center mt-20 shadow-md py-10">
+    <div className="flex flex-col md:flex-row justify-center items-center mt-20 shadow-md py-10 mx-20">
       <div className="w-full md:w-1/2">
         <img
           src="../../images/ecom.jpg"

@@ -66,7 +66,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar/>
-
+      
       {/* Product Carousel - only 5 most recent products */}
       {loading ? (
         <div className="flex-grow flex items-center justify-center">
@@ -77,8 +77,8 @@ export default function HomePage() {
       )}
 
       {/* Category-wise Products - one from each category */}
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-4">Shop by Category</h2>
+      <div className="p-6 text-center mt-5">
+        <h2 className="text-3xl font-bold mb-4">Shop by Category</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Object.entries(categoryProducts).map(([category, productsArray]) => (
             <CategoryCard 
@@ -91,8 +91,8 @@ export default function HomePage() {
       </div>
       
       {/* Best Sellers + Search Bar */}
-      <div className="p-6 bg-gray-50 flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Best Sellers</h2>
+      <div id="best-sellers-section" className="p-6 bg-gray-50 text-center justify-center items-center gap-10 mt-10">
+        <h2 className="text-3xl font-bold hover:text-[rgb(113,127,223)] mb-5">Best Sellers</h2>
         <SearchBar onSearch={handleSearch} />
       </div>
 

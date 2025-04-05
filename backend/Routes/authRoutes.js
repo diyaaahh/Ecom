@@ -14,7 +14,7 @@ router.get(
   googleAuthCallback
 );
 
-// Logout Route
-router.get("/logout", logoutUser);
+
+router.post("/logout", logoutUser);
 
 module.exports = router;
