@@ -15,20 +15,26 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     try {
-        const response = await axios.post(
-            "http://localhost:3000/user/login",
-            { email, password },
-            { withCredentials: true }
-          );
-          
+      const response = await axios.post(
+        "http://localhost:3000/user/login",
+        { email, password },
+        { withCredentials: true }
+      );
+  
       if (response.data.message === "Login successful") {
         toast.success("Login successful!");
-        navigate("/");
+        
+        const userEmail = response.data.user.email;
+  
+        if (userEmail === "admin@gmail.com") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
-      // Handle error (wrong credentials, server error, etc.)
       if (error.response && error.response.data) {
         toast.error(error.response.data.message || "Login failed");
       } else {
@@ -36,6 +42,7 @@ const LoginPage = () => {
       }
     }
   };
+  
 
   return (
     <div className="flex flex-col md:flex-row justify-center items-center mt-20 shadow-md py-10 mx-20">
