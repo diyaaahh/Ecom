@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../components/Navbar'; // Assuming you have this component
-import axios from 'axios'; // Make sure to install axios
+import Navbar from '../components/Navbar'; 
+import axios from 'axios'; 
 import { toast } from 'react-toastify';
 
 const AdminPage = () => {
-  // States for managing products and form data
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [formData, setFormData] = useState({
@@ -29,7 +27,6 @@ const AdminPage = () => {
   const fetchRecentProducts = async () => {
     try {
       const response = await axios.get('http://localhost:3000/product/getrecent?limit=10');
-      // Ensure we have an array even if the API returns a single object or nothing
       setProducts(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching recent products:', error);
@@ -42,7 +39,6 @@ const AdminPage = () => {
   const fetchTopSellingProducts = async () => {
     try {
       const response = await axios.get('http://localhost:3000/product/topselling?limit=5');
-      // Ensure we have an array even if the API returns a single object or nothing
       setTopSellingProducts(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching top selling products:', error);
@@ -51,7 +47,7 @@ const AdminPage = () => {
     }
   };
 
-  // Extract unique categories from products
+
 
 
   // Handle form input changes

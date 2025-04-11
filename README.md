@@ -6,6 +6,7 @@ A full-featured, modern eCommerce web application with user authentication, Goog
 
 - 🔐 User Registration & Login
 - 🔑 Google OAuth Login
+- 🧑‍💻 Admin Panel
 - 🔍 Real-time Product Search
 - 🛒 Add Products to Cart (with Quantity Selection)
 - ⭐ Product Ratings
