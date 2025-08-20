@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import CartItemCard from "../components/CartItem"; 
+import CartItemCard from "../components/cartItem"; 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { loadStripe } from "@stripe/stripe-js";

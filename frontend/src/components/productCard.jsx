@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import StarRating from "./StarRating"; 
+import StarRating from "./starRating"; 
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();

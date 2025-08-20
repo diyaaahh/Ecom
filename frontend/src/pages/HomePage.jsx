@@ -3,9 +3,9 @@ import axios from "axios";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import ProductCarousel from "../components/productCarousel";
-import CategoryCard from "../components/CategoryCard";
-import ProductCard from "../components/ProductCard";
-import SearchBar from "../components/SearchBar";
+import CategoryCard from "../components/categoryCard";
+import ProductCard from "../components/productCard";
+import SearchBar from "../components/searchBar";
 
 export default function HomePage() {
   const [recentProducts, setRecentProducts] = useState([]);
