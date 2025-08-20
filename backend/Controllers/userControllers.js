@@ -31,6 +31,34 @@ const createUser = async (req, res) => {
     }
 };
 
+// admin check middleware
+const checkAdmin = (req, res) => {
+    const token = req.cookies.authToken;
+    
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Check if user is admin (you'll need to add isAdmin field to your database)
+        // For now, you can hardcode admin emails or add an isAdmin column to user_info table
+        const adminEmails = ['myadmin@gmail.com']; 
+        
+        if (adminEmails.includes(decoded.email)) {
+            res.json({ 
+                isAdmin: true, 
+                user: { id: decoded.userId, email: decoded.email, name: decoded.name } 
+            });
+        } else {
+            res.status(403).json({ message: "Forbidden - Admin access required" });
+        }
+    } catch (error) {
+        console.log("JWT Verification Failed:", error);
+        return res.status(401).json({ message: "Invalid token" });
+    }
+};
 
 // Login Controller
 const loginUser = async (req, res) => {
@@ -100,4 +128,4 @@ const loginUser = async (req, res) => {
 
 
 module.exports = {
-    createUser, loginUser ,authCheck }
+    createUser, loginUser ,authCheck,checkAdmin  }

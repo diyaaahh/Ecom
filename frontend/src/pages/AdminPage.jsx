@@ -17,6 +17,9 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
 
+  // Category options
+  const categoryOptions = ['Men', 'Women', 'Unisex'];
+
   // Fetch initial data
   useEffect(() => {
     fetchRecentProducts();
@@ -46,9 +49,6 @@ const AdminPage = () => {
       setTopSellingProducts([]);
     }
   };
-
-
-
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -101,7 +101,7 @@ const AdminPage = () => {
     } catch (error) {
       console.error('Error adding product:', error);
       showMessage('Failed to add product. Please try again.', 'error');
-      toast.success("Error adding product!")
+      toast.error("Error adding product!")
     } finally {
       setLoading(false);
     }
@@ -190,8 +190,6 @@ const AdminPage = () => {
         {/* Add Product Tab */}
         {activeTab === 'add-product' && (
           <div className="bg-white p-6 rounded shadow">
-           
-            
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label className="block text-md font-medium text-gray-700 mb-1">
@@ -224,29 +222,21 @@ const AdminPage = () => {
                 <label className="block text-md font-medium text-gray-700 mb-1">
                   Category*
                 </label>
-                <textarea
+                <select
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
                   className="w-full p-2 border rounded"
-
-                />
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categoryOptions.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
               </div>
-              
-              {formData.category === 'new' && (
-                <div className="mb-4">
-                  <label className="block text-md font-medium text-gray-700 mb-1">
-                    New Category Name*
-                  </label>
-                  <input
-                    type="text"
-                    name="newCategory"
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-              )}
               
               <div className="mb-4">
                 <label className="block text-md font-medium text-gray-700 mb-1">

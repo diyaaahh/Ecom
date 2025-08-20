@@ -10,7 +10,9 @@ import { loadStripe } from "@stripe/stripe-js";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const CartPage = () => {
-    const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,22 +21,48 @@ const CartPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const checkUserAndAdmin = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/user/auth", {
+        // Check if user is logged in
+        const userRes = await axios.get("http://localhost:3000/user/auth", {
           withCredentials: true,
         });
-        setUser(res.data.user);
+        setUser(userRes.data.user);
+
+        // Check if user is admin
+        try {
+          const adminRes = await axios.get("http://localhost:3000/user/admin-check", {
+            withCredentials: true,
+          });
+          setIsAdmin(adminRes.data.isAdmin);
+          
+          // If user is admin, redirect to home page
+          if (adminRes.data.isAdmin) {
+            toast.info("Cart access is not available for admin users");
+            navigate("/");
+            return;
+          }
+        } catch (adminError) {
+          // User is not admin, which is what we want for cart access
+          setIsAdmin(false);
+        }
+
+        setAuthLoading(false);
       } catch (error) {
         console.error("User not logged in", error);
+        toast.error("Please log in to access your cart");
+        navigate("/login");
       }
     };
-    fetchUser();
-  }, []);
+
+    checkUserAndAdmin();
+  }, [navigate]);
 
   useEffect(() => {
-    fetchCartItems();
-  }, []);
+    if (!authLoading && user && !isAdmin) {
+      fetchCartItems();
+    }
+  }, [user, isAdmin, authLoading]);
 
   const fetchCartItems = async () => {
     try {
@@ -65,18 +93,11 @@ const CartPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (user) {  // Only fetch cart items when user is available
-      fetchCartItems();
-    }
-  }, [user]);  // Re-run when user changes
-
   const handleRemoveItem = async (itemId) => {
     try {
       await axios.delete(`http://localhost:3000/cart/remove`, {
         withCredentials: true,
         data:{id:itemId, userEmail:user.email}
-
       });
       
       toast.success("Item removed from cart!");
@@ -119,6 +140,20 @@ const CartPage = () => {
     }
   };
 
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen pt-20 pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8 mt-8">Checking access...</h1>
+      </div>
+    );
+  }
+
+  // Don't render anything if user is admin (they'll be redirected)
+  if (isAdmin) {
+    return null;
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen pt-20 pb-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -154,8 +189,8 @@ const CartPage = () => {
     );
   }
 
-// CartPage component return statement
-return (
+  // CartPage component return statement
+  return (
     <>
     <div className="min-h-screen pt-20 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl">
       <h1 className="text-3xl font-bold mb-20 text-center">Shopping Cart</h1>
@@ -219,7 +254,6 @@ return (
     <Footer/>
     <Navbar/>
     </>
-
   );
 };
 

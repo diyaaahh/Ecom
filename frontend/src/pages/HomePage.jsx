@@ -12,8 +12,12 @@ export default function HomePage() {
   const [categoryProducts, setCategoryProducts] = useState({});
   const [topSellingProducts, setTopSellingProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [displayedProducts, setDisplayedProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [productsPerLoad] = useState(8); // Number of products to show initially and load each time
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -40,6 +44,10 @@ export default function HomePage() {
         const topSellingResponse = await axios.get("http://localhost:3000/product/topselling?limit=12");
         setTopSellingProducts(topSellingResponse.data);
         setFilteredProducts(topSellingResponse.data);
+        
+        // Initially display first 8 products
+        setDisplayedProducts(topSellingResponse.data.slice(0, productsPerLoad));
+        setCurrentIndex(productsPerLoad);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -48,20 +56,42 @@ export default function HomePage() {
     };
   
     fetchProducts();
-  }, []);
+  }, [productsPerLoad]);
 
   // Handle search functionality
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (query.trim() === "") {
       setFilteredProducts(topSellingProducts);
+      // Reset to first 8 products when clearing search
+      setDisplayedProducts(topSellingProducts.slice(0, productsPerLoad));
+      setCurrentIndex(productsPerLoad);
     } else {
       const filtered = topSellingProducts.filter((product) =>
         product.name.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredProducts(filtered);
+      // Show first 8 filtered results
+      setDisplayedProducts(filtered.slice(0, productsPerLoad));
+      setCurrentIndex(productsPerLoad);
     }
   };
+
+  // Load more products
+  const handleLoadMore = () => {
+    setLoadingMore(true);
+    
+    // Simulate loading delay for better UX
+    setTimeout(() => {
+      const nextProducts = filteredProducts.slice(currentIndex, currentIndex + productsPerLoad);
+      setDisplayedProducts(prev => [...prev, ...nextProducts]);
+      setCurrentIndex(prev => prev + productsPerLoad);
+      setLoadingMore(false);
+    }, 500);
+  };
+
+  // Check if there are more products to load
+  const hasMoreProducts = currentIndex < filteredProducts.length;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -96,16 +126,47 @@ export default function HomePage() {
         <SearchBar onSearch={handleSearch} />
       </div>
 
-      {/* Top Selling Products */}
+      {/* Top Selling Products with Lazy Loading */}
       <div className="p-6 bg-gray-50">
         {loading ? (
           <p>Loading top selling products...</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {displayedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+            
+            {/* Load More Section */}
+            {hasMoreProducts && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="bg-black text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-[rgb(113,127,223)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loadingMore ? "Loading..." : "Load More Products"}
+                </button>
+              </div>
+            )}
+            
+            {/* No more products message */}
+            {!hasMoreProducts && displayedProducts.length > 0 && (
+              <div className="text-center mt-8">
+                <p className="text-gray-600 text-lg">You've seen all products!</p>
+              </div>
+            )}
+            
+            {/* No products found message */}
+            {displayedProducts.length === 0 && !loading && (
+              <div className="text-center mt-8">
+                <p className="text-gray-600 text-lg">
+                  {searchQuery ? `No products found for "${searchQuery}"` : "No products available"}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 

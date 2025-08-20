@@ -11,6 +11,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SuccessPage from './pages/SuccessPage';
 import AdminPage from './pages/AdminPage';
+import ProtectedAdminRoute from './routes/protectedRoutes';
 function App() {
 
   return (<>
@@ -23,7 +24,14 @@ function App() {
       <Route path='/shop/:category' element={<ShopPage/>}/>
       <Route path='/cart' element={<CartPage/>}/>
       <Route path='/success' element={<SuccessPage/>}/>
-      <Route path='/admin' element={<AdminPage/>}/>
+      <Route 
+          path="/admin" 
+          element={
+            <ProtectedAdminRoute>
+              <AdminPage />
+            </ProtectedAdminRoute>
+          } 
+        />
     </Routes>
    </Router>
 

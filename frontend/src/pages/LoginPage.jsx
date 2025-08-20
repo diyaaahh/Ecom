@@ -28,7 +28,7 @@ const LoginPage = () => {
         
         const userEmail = response.data.user.email;
   
-        if (userEmail === "admin@gmail.com") {
+        if (userEmail === "myadmin@gmail.com") {
           navigate("/admin");
         } else {
           navigate("/");
