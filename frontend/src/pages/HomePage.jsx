@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import ProductCarousel from "../components/ProductCarousel";
+import ProductCarousel from "../components/productCarousel";
 import CategoryCard from "../components/CategoryCard";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
