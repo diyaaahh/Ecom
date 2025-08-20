@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 // Handle Google Login Callback
+const CLIENT_URL =
+  process.env.NODE_ENV === "production"
+    ? process.env.CLIENT_URL_PROD
+    : process.env.CLIENT_URL;
 const googleAuthCallback = (req, res) => {
   if (!req.user) {
     return res.status(401).json({ message: "Authentication failed" });
@@ -13,7 +17,7 @@ const googleAuthCallback = (req, res) => {
     sameSite: "Lax",
     maxAge: 3600000, // 1 hour
   });
-  res.redirect("http://localhost:5173/"); // Redirect to homepage after login
+  res.redirect(`${CLIENT_URL}/`); // Redirect to homepage after login
 };
 
 // Logout user
