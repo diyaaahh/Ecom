@@ -17,7 +17,7 @@ const googleAuthCallback = (req, res) => {
     sameSite: "Lax",
     maxAge: 3600000, // 1 hour
   });
-  res.redirect(`${CLIENT_URL}/`); // Redirect to homepage after login
+  res.redirect("https://ecom-bay-sigma.vercel.app/"); // Redirect to homepage after login
 };
 
 // Logout user
